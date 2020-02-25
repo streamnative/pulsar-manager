@@ -21,13 +21,15 @@ jobs:
           cd front-end
           npm install --save
           npm run build:prod
+          cd ../
           mkdir -p temp-release temp-release/pulsar-manager
           cd temp-release
           cp ../distribution/LICENSE.bin.txt pulsar-manager/LICENSE
           cp ../distribution/NOTICE.bin.txt pulsar-manager/NOTICE
           cp -r ../distribution/licenses pulsar-manager/
           cp -r ../build/distributions/pulsar-manager.tar ../front-end/dist pulsar-manager
-          tar -czvf apache-pulsar-manager-${version}-bin.tar.gz pulsar-manager.tar pulsar-manager
+          tar -czvf apache-pulsar-manager-${version}-bin.tar.gz pulsar-manager
+          mv apache-pulsar-manager-${version}-bin.tar.gz ../
 
       - name: publish
         uses: skx/github-action-publish-binaries@release-0.11
