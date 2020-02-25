@@ -36,8 +36,8 @@ jobs:
           git checkout release/pm
 
       - name: publish code to github
-          run: |
-            ls -a
-            echo $(pwd)
-            docker build -f scripts/Dockerfile -t sn-pulsar-manager .
-            docker run -e ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }} -e GITHUB_REPOSITORY=streamnative/pulsar-manager -v $(pwd):/sn-pm sn-pulsar-manager sh -c 'upload-script.sh /sn-pm/apache-pulsar-manager-*'
+        run: |
+          ls -a
+          echo $(pwd)
+          docker build -f scripts/Dockerfile -t sn-pulsar-manager .
+          docker run -e ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }} -e GITHUB_REPOSITORY=streamnative/pulsar-manager -v $(pwd):/sn-pm sn-pulsar-manager sh -c 'upload-script.sh /sn-pm/apache-pulsar-manager-*'
