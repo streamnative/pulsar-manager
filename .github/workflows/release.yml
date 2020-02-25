@@ -1,7 +1,9 @@
 name: Pulsar Manager Release
 
 on:
-  release:
+  push:
+    branches:
+      - release/pm
 
 jobs:
   upload:
@@ -32,9 +34,10 @@ jobs:
           tar -czvf apache-pulsar-manager-${version}-bin.tar.gz pulsar-manager
           mv apache-pulsar-manager-${version}-bin.tar.gz ../
           git checkout release/pm
-      - name: publish
-        uses: skx/github-action-publish-binaries@release-0.11
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: 'apache-pulsar-manager-*'
+
+      - name: publish code to github
+          run: |
+            ls -a
+            echo $(pwd)
+            docker build -f scripts/Dockerfile -t sn-pulsar-manager .
+            docker run -e ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }} -e GITHUB_REPOSITORY=streamnative/pulsar-manager -v $(pwd):/sn-pm sn-pulsar-manager sh -c 'upload-script.sh /sn-pm/apache-pulsar-manager-*'
