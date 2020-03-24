@@ -69,4 +69,4 @@ COPY docker/entrypoint.sh /pulsar-manager/
 
 COPY front-end/dist /usr/share/nginx/html/
 
-ENTRYPOINT [ "/pulsar-manager/entrypoint.sh" ]
+CMD [ "/pulsar-manager/entrypoint.sh" ]
