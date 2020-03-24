@@ -33,6 +33,7 @@ jobs:
           cp -r ../build/distributions/pulsar-manager.tar ../front-end/dist pulsar-manager
           tar -czvf apache-pulsar-manager-${version}-bin.tar.gz pulsar-manager
           mv apache-pulsar-manager-${version}-bin.tar.gz ../
+          cd ../
           git checkout release/pm
 
       - name: publish code to github
@@ -41,3 +42,11 @@ jobs:
           echo $(pwd)
           docker build -f scripts/Dockerfile -t sn-pulsar-manager .
           docker run -e ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }} -e GITHUB_REPOSITORY=streamnative/pulsar-manager -v $(pwd):/sn-pm sn-pulsar-manager sh -c 'upload-script.sh /sn-pm/apache-pulsar-manager-*'
+
+      - name: publis docker image
+        run: |
+          version=`cat VERSION`
+          git checkout master
+          docker login -u="zymap" -p="nmgzy19961025"
+          docker build -f docker/Dockerfile --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` --build-arg VCS_REF=`git rev-parse --short HEAD` --build-arg VERSION=`git rev-parse --short HEAD` -t streamnative/pulsar-manager:${version} .
+          docker push streamnative/pulsar-manager:${version}
