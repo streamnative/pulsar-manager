@@ -32,6 +32,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.schema-version="1.0"
 
 RUN apk update
+RUN apk add --no-cache bash
 
 RUN apk add nginx \
   && apk add supervisor \
