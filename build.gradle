@@ -40,6 +40,14 @@ repositories {
 
 configurations {
     testPlugins {}
+    implementation {
+        exclude group: 'log4j', module: 'log4j'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j-impl'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+        exclude group: 'io.streamnative', module: 'pulsar-functions-instance'
+    }
 }
 
 dependencies {
@@ -118,14 +126,14 @@ dependencies {
     compile group: 'com.github.pagehelper', name: 'pagehelper-spring-boot-starter', version: pageHelperVersion
     compile group: 'com.google.guava', name: 'guava', version: guavaVersion
     compile group: 'com.google.code.gson', name: 'gson', version: gsonVersion
-    compile group: 'org.apache.pulsar', name: 'pulsar-common', version: pulsarVersion
-    compile group: 'org.apache.pulsar', name: 'pulsar-client-admin-original', version: pulsarVersion
-    compile group: 'org.apache.pulsar', name: 'pulsar-client-auth-athenz', version: pulsarVersion
-    compile group: 'org.apache.pulsar', name: 'pulsar-client-auth-sasl', version: pulsarVersion
+    compile group: 'io.streamnative', name: 'pulsar-common', version: pulsarVersion
+    compile group: 'io.streamnative', name: 'pulsar-client-admin-original', version: pulsarVersion
+    compile group: 'io.streamnative', name: 'pulsar-client-auth-athenz', version: pulsarVersion
+    compile group: 'io.streamnative', name: 'pulsar-client-auth-sasl', version: pulsarVersion
     compile group: 'com.yahoo.athenz', name: 'athenz-zts-java-client', version: athenzVersion
     compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggeruiVersion
-    compile group: 'org.apache.pulsar', name: 'pulsar-broker', version: pulsarVersion
+    compile group: 'io.streamnative', name: 'pulsar-broker', version: pulsarVersion
     compile group: 'commons-validator', name: 'commons-validator', version: commonsValidatorVersion
     compile (group: 'org.bkvm', name: 'bkvm', version: bkvmVersion, ext: 'war', classifier:'war-no-libs') {
         exclude group: 'org.slf4j', module: 'slf4j-jdk14'

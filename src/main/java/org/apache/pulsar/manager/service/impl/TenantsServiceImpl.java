@@ -19,6 +19,7 @@ import com.google.common.collect.Sets;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.admin.PulsarAdminException;
+import org.apache.pulsar.common.policies.data.TenantInfoImpl;
 import org.apache.pulsar.manager.controller.exception.PulsarAdminOperationException;
 import org.apache.pulsar.manager.entity.TopicStatsEntity;
 import org.apache.pulsar.manager.entity.TopicsStatsRepository;
@@ -135,7 +136,7 @@ public class TenantsServiceImpl implements TenantsService {
     }
 
     public Map<String, String> createTenant(String tenant, String role, String cluster, String requestHost) {
-        TenantInfo tenantInfo = new TenantInfo(Sets.newHashSet(role), Sets.newHashSet(cluster));
+        TenantInfo tenantInfo = new TenantInfoImpl(Sets.newHashSet(role), Sets.newHashSet(cluster));
         Map<String, String> result = Maps.newHashMap();
         try {
             pulsarAdminService.tenants(requestHost).createTenant(tenant, tenantInfo);

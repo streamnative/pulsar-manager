@@ -30,10 +30,12 @@ import org.apache.pulsar.client.admin.PulsarAdmin;
 import org.apache.pulsar.client.admin.PulsarAdminBuilder;
 import org.apache.pulsar.client.admin.Tenants;
 import org.apache.pulsar.client.admin.Topics;
+import org.apache.pulsar.client.admin.internal.PulsarAdminImpl;
 import org.apache.pulsar.client.api.Authentication;
 import org.apache.pulsar.client.api.AuthenticationDataProvider;
 import org.apache.pulsar.client.api.AuthenticationFactory;
 import org.apache.pulsar.client.api.PulsarClientException;
+import org.apache.pulsar.client.impl.conf.ClientConfigurationData;
 import org.apache.pulsar.manager.controller.exception.PulsarAdminOperationException;
 import org.apache.pulsar.manager.service.PulsarAdminService;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,14 +63,16 @@ public class PulsarAdminServiceImpl implements PulsarAdminService {
     @Value("${backend.jwt.token:}")
     private String pulsarJwtToken;
 
-    private Map<String, PulsarAdmin> pulsarAdmins = new HashMap<>();
+    private Map<String, PulsarAdminImpl> pulsarAdmins = new HashMap<>();
+
+    private Map<String, String> pulsarAdminsAuthentication = new HashMap<>();
 
     @PreDestroy
     public void destroy() {
         pulsarAdmins.values().forEach(value -> value.close());
     }
 
-    public synchronized PulsarAdmin getPulsarAdmin(String url) {
+    public synchronized PulsarAdminImpl getPulsarAdmin(String url) {
         if (!pulsarAdmins.containsKey(url)) {
             pulsarAdmins.put(url, this.createPulsarAdmin(url));
         }
@@ -129,21 +133,20 @@ public class PulsarAdminServiceImpl implements PulsarAdminService {
         return result;
     }
 
-    private PulsarAdmin createPulsarAdmin(String url) {
+    private PulsarAdminImpl createPulsarAdmin(String url) {
         try {
             log.info("Create Pulsar Admin instance. url={}, authPlugin={}, authParams={}, tlsAllowInsecureConnection={}, tlsTrustCertsFilePath={}, tlsEnableHostnameVerification={}",
                     url, authPlugin, authParams, tlsAllowInsecureConnection, tlsTrustCertsFilePath, tlsEnableHostnameVerification);
-            PulsarAdminBuilder pulsarAdminBuilder = PulsarAdmin.builder();
-            pulsarAdminBuilder.serviceHttpUrl(url);
+            ClientConfigurationData clientConfigurationData = new ClientConfigurationData();
             if (StringUtils.isNotBlank(pulsarJwtToken)) {
-                pulsarAdminBuilder.authentication(AuthenticationFactory.token(pulsarJwtToken));
+                clientConfigurationData.setAuthentication(AuthenticationFactory.token(pulsarJwtToken));
             } else {
-                pulsarAdminBuilder.authentication(authPlugin, authParams);
+                clientConfigurationData.setAuthentication(AuthenticationFactory.create(authPlugin, authParams));
             }
-            pulsarAdminBuilder.allowTlsInsecureConnection(tlsAllowInsecureConnection);
-            pulsarAdminBuilder.tlsTrustCertsFilePath(tlsTrustCertsFilePath);
-            pulsarAdminBuilder.enableTlsHostnameVerification(tlsEnableHostnameVerification);
-            return pulsarAdminBuilder.build();
+            clientConfigurationData.setTlsAllowInsecureConnection(tlsAllowInsecureConnection);
+            clientConfigurationData.setTlsTrustCertsFilePath(tlsTrustCertsFilePath);
+            clientConfigurationData.setTlsHostnameVerificationEnable(tlsEnableHostnameVerification);
+            return new PulsarAdminImpl(url, clientConfigurationData);
         } catch (PulsarClientException e) {
             PulsarAdminOperationException pulsarAdminOperationException = new PulsarAdminOperationException("Failed to create Pulsar Admin instance.");
             log.error(pulsarAdminOperationException.getMessage(), e);

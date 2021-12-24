@@ -18,6 +18,7 @@ import com.google.common.collect.Maps;
 import org.apache.pulsar.client.admin.Clusters;
 import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.common.policies.data.ClusterData;
+import org.apache.pulsar.common.policies.data.ClusterDataImpl;
 import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
 import org.junit.Assert;
@@ -63,7 +64,9 @@ public class ClustersServiceImplTest {
     public void clusterServiceImplTest() throws PulsarAdminException {
         Mockito.when(pulsarAdminService.clusters("http://localhost:8080")).thenReturn(clusters);
         Mockito.when(pulsarAdminService.clusters("http://localhost:8080").getClusters()).thenReturn(Arrays.asList("standalone"));
-        ClusterData standaloneClusterData = new ClusterData("http://broker-1:8080", null, "pulsar://broker-1:6650", null);
+        ClusterDataImpl standaloneClusterData = new ClusterDataImpl();
+        standaloneClusterData.setServiceUrl("http://localhost:8080");
+        standaloneClusterData.setBrokerServiceUrl("pulsar://broker-1:6650");
         Mockito.when(pulsarAdminService.clusters("http://localhost:8080").getCluster("standalone")).thenReturn(standaloneClusterData);
 
         Map<String, Object> brokerEntity = Maps.newHashMap();
@@ -80,7 +83,7 @@ public class ClustersServiceImplTest {
         Mockito.when(brokersService.getBrokersList(1, 1, "standalone", "http://localhost:8080")).thenReturn(brokersMap);
 
         Map<String, Object> result = clustersService.getClustersList(1, 1, "http://localhost:8080", null);
-        Assert.assertEquals("[{cluster=standalone, serviceUrlTls=null, brokers=1, serviceUrl=http://broker-1:8080, " +
+        Assert.assertEquals("[{cluster=standalone, serviceUrlTls=null, brokers=1, serviceUrl=http://localhost:8080, " +
                         "brokerServiceUrlTls=null, brokerServiceUrl=pulsar://broker-1:6650}]", result.get("data").toString());
         Assert.assertEquals(1, result.get("total"));
         Assert.assertEquals(1, result.get("pageSize"));

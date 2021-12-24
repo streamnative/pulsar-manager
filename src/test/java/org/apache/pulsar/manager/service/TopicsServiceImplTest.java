@@ -19,6 +19,7 @@ import org.apache.pulsar.client.admin.Topics;
 import org.apache.pulsar.client.api.Message;
 import org.apache.pulsar.client.api.Schema;
 import org.apache.pulsar.client.impl.MessageImpl;
+import org.apache.pulsar.common.api.proto.MessageMetadata;
 import org.apache.pulsar.common.partition.PartitionedTopicMetadata;
 import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.entity.TopicStatsEntity;
@@ -39,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.apache.pulsar.common.api.proto.PulsarApi;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
@@ -135,7 +135,7 @@ public class TopicsServiceImplTest {
         Mockito.when(pulsarAdminService.topics("http://localhost:8080")).thenReturn(topics);
         List<Message<byte[]>> messages = new ArrayList<>();
         messages.add(new MessageImpl<>("persistent://public/default/test", "1:1", Maps.newTreeMap(), "test".getBytes(),
-                Schema.BYTES, PulsarApi.MessageMetadata.newBuilder()));
+                Schema.BYTES, new MessageMetadata()));
         Mockito.when(topics.peekMessages("persistent://public/default/test", "sub-1", 1)).thenReturn(messages);
 
         List<Map<String, Object>> result = topicsService.peekMessages(

@@ -16,6 +16,7 @@ package org.apache.pulsar.manager.service;
 import org.apache.pulsar.client.admin.Brokers;
 import org.apache.pulsar.client.admin.Clusters;
 import org.apache.pulsar.common.policies.data.FailureDomain;
+import org.apache.pulsar.common.policies.data.FailureDomainImpl;
 import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
 
@@ -59,7 +60,7 @@ public class BrokersServiceImplTest {
 
     @Test
     public void brokersServiceTest() throws Exception{
-        FailureDomain fdomain = new FailureDomain();
+        FailureDomainImpl fdomain = new FailureDomainImpl();
         fdomain.setBrokers(new HashSet<String>(Arrays.asList("broker-1:8080")));
         Map<String, FailureDomain> fMap = new HashMap<>();
         fMap.put("fdomain-1",fdomain);

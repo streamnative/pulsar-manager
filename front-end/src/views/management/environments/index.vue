@@ -90,190 +90,190 @@
 </template>
 
 <script>
-  import { putEnvironment, fetchEnvironments, deleteEnvironment, updateEnvironment } from '@/api/environments'
-  import { setEnvironment } from '@/utils/environment'
-  import store from '@/store'
+import { putEnvironment, fetchEnvironments, deleteEnvironment, updateEnvironment } from '@/api/environments'
+import { setEnvironment } from '@/utils/environment'
+import store from '@/store'
 
-  export default {
-    name: 'EnvironmentInfo',
-    data() {
-      return {
-        environmentList: [],
-        environmentTableKey: 0,
-        environmentListLoading: false,
-        textMap: {
-          create: this.$i18n.t('env.newEnvDialogCaption'),
-          delete: this.$i18n.t('env.deleteEnvDialogCaption'),
-          update: this.$i18n.t('env.updateEnvDialogCaption')
-        },
-        dialogFormVisible: false,
-        dialogStatus: '',
-        form: {
-          environment: '',
-          broker: '',
-          bookie: ''
-        },
-        temp: {
-          'name': '',
-          'broker': '',
-          'bookie': ''
-        },
-        superUser: false,
-        roles: [],
-        rules: {
-          environment: [{ required: true, message: this.$i18n.t('env.envNameIsRequired'), trigger: 'blur' }],
-          broker: [{ required: true, message: this.$i18n.t('env.serviceUrlIsRequired'), trigger: 'blur' }],
-          bookie: [{ required: true, message: this.$i18n.t('env.bookieUrlIsRequired'), trigger: 'blur' }]
-        }
+export default {
+  name: 'EnvironmentInfo',
+  data() {
+    return {
+      environmentList: [],
+      environmentTableKey: 0,
+      environmentListLoading: false,
+      textMap: {
+        create: this.$i18n.t('env.newEnvDialogCaption'),
+        delete: this.$i18n.t('env.deleteEnvDialogCaption'),
+        update: this.$i18n.t('env.updateEnvDialogCaption')
+      },
+      dialogFormVisible: false,
+      dialogStatus: '',
+      form: {
+        environment: '',
+        broker: '',
+        bookie: ''
+      },
+      temp: {
+        'name': '',
+        'broker': '',
+        'bookie': ''
+      },
+      superUser: false,
+      roles: [],
+      rules: {
+        environment: [{ required: true, message: this.$i18n.t('env.envNameIsRequired'), trigger: 'blur' }],
+        broker: [{ required: true, message: this.$i18n.t('env.serviceUrlIsRequired'), trigger: 'blur' }],
+        bookie: [{ required: true, message: this.$i18n.t('env.bookieUrlIsRequired'), trigger: 'blur' }]
       }
+    }
+  },
+  created() {
+    this.getEnvironments()
+    this.roles = store.getters && store.getters.roles
+    if (this.roles.includes('super')) {
+      this.superUser = true
+    } else {
+      this.superUser = false
+    }
+  },
+  methods: {
+    getEnvironments() {
+      fetchEnvironments().then(response => {
+        if (!response.data) return
+        this.environmentList = []
+        for (var i = 0; i < response.data.data.length; i++) {
+          this.environmentList.push({
+            'environment': response.data.data[i].name,
+            'broker': response.data.data[i].broker,
+            'bookie': response.data.data[i].bookie
+          })
+        }
+      })
     },
-    created() {
-      this.getEnvironments()
-      this.roles = store.getters && store.getters.roles
+    handleCreateEnvironment() {
+      this.form.environment = ''
+      this.form.broker = ''
+      this.dialogFormVisible = true
+      this.dialogStatus = 'create'
+    },
+    handleDeleteEnvironment(row) {
+      this.temp.name = row.environment
+      this.temp.broker = row.broker
+      this.dialogFormVisible = true
+      this.dialogStatus = 'delete'
+    },
+    handleUpdateEnvironment(row) {
+      this.form.environment = row.environment
+      this.form.broker = row.broker
+      this.form.bookie = row.bookie
+      this.dialogFormVisible = true
+      this.dialogStatus = 'update'
+    },
+    handleOptions() {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          switch (this.dialogStatus) {
+            case 'create':
+              this.createEnvironment()
+              break
+            case 'delete':
+              this.deleteEnvironment()
+              break
+            case 'update':
+              this.updateEnvironment()
+              break
+          }
+        }
+      })
+    },
+    createEnvironment() {
+      const data = {
+        'name': this.form.environment,
+        'broker': this.form.broker,
+        'bookie': this.form.bookie
+      }
+      putEnvironment(data).then(response => {
+        if (!response.data) return
+        if (response.data.hasOwnProperty('error')) {
+          this.$notify({
+            title: 'error',
+            message: response.data.error,
+            type: 'error',
+            duration: 2000
+          })
+          return
+        }
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('env.addEnvSuccessNotification'),
+          type: 'success',
+          duration: 2000
+        })
+        this.dialogFormVisible = false
+        this.getEnvironments()
+      })
+    },
+    deleteEnvironment() {
+      const data = {
+        'name': this.temp.name,
+        'broker': this.temp.broker
+      }
+      deleteEnvironment(data).then(response => {
+        if (!response.data) return
+        if (response.data.hasOwnProperty('error')) {
+          this.$notify({
+            title: 'error',
+            message: response.data.error,
+            type: 'error',
+            duration: 2000
+          })
+          return
+        }
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('env.deleteEnvSuccessNotification'),
+          type: 'success',
+          duration: 2000
+        })
+        this.getEnvironments()
+        this.dialogFormVisible = false
+      })
+    },
+    updateEnvironment() {
+      const data = {
+        'name': this.form.environment,
+        'broker': this.form.broker,
+        'bookie': this.form.bookie
+      }
+      updateEnvironment(data).then(response => {
+        if (!response.data) return
+        if (response.data.hasOwnProperty('error')) {
+          this.$notify({
+            title: 'error',
+            message: response.data.error,
+            type: 'error',
+            duration: 2000
+          })
+          return
+        }
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('env.updateEnvSuccessNotification'),
+          type: 'success',
+          duration: 2000
+        })
+        this.getEnvironments()
+        this.dialogFormVisible = false
+      })
+    },
+    handleSetEnvironment(environment) {
+      setEnvironment(environment)
       if (this.roles.includes('super')) {
-        this.superUser = true
+        this.$router.push({ path: '/management/tenants' })
       } else {
-        this.superUser = false
-      }
-    },
-    methods: {
-      getEnvironments() {
-        fetchEnvironments().then(response => {
-          if (!response.data) return
-          this.environmentList = []
-          for (var i = 0; i < response.data.data.length; i++) {
-            this.environmentList.push({
-              'environment': response.data.data[i].name,
-              'broker': response.data.data[i].broker,
-              'bookie': response.data.data[i].bookie
-            })
-          }
-        })
-      },
-      handleCreateEnvironment() {
-        this.form.environment = ''
-        this.form.broker = ''
-        this.dialogFormVisible = true
-        this.dialogStatus = 'create'
-      },
-      handleDeleteEnvironment(row) {
-        this.temp.name = row.environment
-        this.temp.broker = row.broker
-        this.dialogFormVisible = true
-        this.dialogStatus = 'delete'
-      },
-      handleUpdateEnvironment(row) {
-        this.form.environment = row.environment
-        this.form.broker = row.broker
-        this.form.bookie = row.bookie
-        this.dialogFormVisible = true
-        this.dialogStatus = 'update'
-      },
-      handleOptions() {
-        this.$refs['form'].validate((valid) => {
-          if (valid) {
-            switch (this.dialogStatus) {
-              case 'create':
-                this.createEnvironment()
-                break
-              case 'delete':
-                this.deleteEnvironment()
-                break
-              case 'update':
-                this.updateEnvironment()
-                break
-            }
-          }
-        })
-      },
-      createEnvironment() {
-        const data = {
-          'name': this.form.environment,
-          'broker': this.form.broker,
-          'bookie': this.form.bookie
-        }
-        putEnvironment(data).then(response => {
-          if (!response.data) return
-          if (response.data.hasOwnProperty('error')) {
-            this.$notify({
-              title: 'error',
-              message: response.data.error,
-              type: 'error',
-              duration: 2000
-            })
-            return
-          }
-          this.$notify({
-            title: 'success',
-            message: this.$i18n.t('env.addEnvSuccessNotification'),
-            type: 'success',
-            duration: 2000
-          })
-          this.dialogFormVisible = false
-          this.getEnvironments()
-        })
-      },
-      deleteEnvironment() {
-        const data = {
-          'name': this.temp.name,
-          'broker': this.temp.broker
-        }
-        deleteEnvironment(data).then(response => {
-          if (!response.data) return
-          if (response.data.hasOwnProperty('error')) {
-            this.$notify({
-              title: 'error',
-              message: response.data.error,
-              type: 'error',
-              duration: 2000
-            })
-            return
-          }
-          this.$notify({
-            title: 'success',
-            message: this.$i18n.t('env.deleteEnvSuccessNotification'),
-            type: 'success',
-            duration: 2000
-          })
-          this.getEnvironments()
-          this.dialogFormVisible = false
-        })
-      },
-      updateEnvironment() {
-        const data = {
-          'name': this.form.environment,
-          'broker': this.form.broker,
-          'bookie': this.form.bookie
-        }
-        updateEnvironment(data).then(response => {
-          if (!response.data) return
-          if (response.data.hasOwnProperty('error')) {
-            this.$notify({
-              title: 'error',
-              message: response.data.error,
-              type: 'error',
-              duration: 2000
-            })
-            return
-          }
-          this.$notify({
-            title: 'success',
-            message: this.$i18n.t('env.updateEnvSuccessNotification'),
-            type: 'success',
-            duration: 2000
-          })
-          this.getEnvironments()
-          this.dialogFormVisible = false
-        })
-      },
-      handleSetEnvironment(environment) {
-        setEnvironment(environment)
-        if (this.roles.includes('super')) {
-          this.$router.push({ path: '/management/tenants' })
-        } else {
-          this.$router.push({ path: '/management/admin/tenants/tenantInfo' })
-        }
+        this.$router.push({ path: '/management/admin/tenants/tenantInfo' })
       }
     }
   }
+}
 </script>

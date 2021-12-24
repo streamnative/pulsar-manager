@@ -13,6 +13,7 @@
  */
 package org.apache.pulsar.manager.service;
 
+import org.apache.pulsar.common.policies.data.ClusterDataImpl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -74,11 +75,11 @@ public class EnvironmentCacheServiceImplTest {
     private EnvironmentEntity environment2;
     private EnvironmentEntity emptyEnvironment;
     private final String cluster1_0_name = "cluster1_0";
-    private ClusterData cluster1_0;
+    private ClusterDataImpl cluster1_0;
     private final String cluster2_0_name = "cluster2_0";
-    private ClusterData cluster2_0;
+    private ClusterDataImpl cluster2_0;
     private final String cluster2_1_name = "cluster2_1";
-    private ClusterData cluster2_1;
+    private ClusterDataImpl cluster2_1;
 
     @Before
     public void setup() throws PulsarAdminException {
@@ -97,13 +98,13 @@ public class EnvironmentCacheServiceImplTest {
         emptyEnvironment.setBookie("http://empty_env:8000");
 
         // setup 3 clusters
-        cluster1_0 = new ClusterData();
+        cluster1_0 = new ClusterDataImpl();
         cluster1_0.setServiceUrl("http://cluster1_0:8080");
 
-        cluster2_0 = new ClusterData();
+        cluster2_0 = new ClusterDataImpl();
         cluster2_0.setServiceUrl("http://cluster2_0:8080");
 
-        cluster2_1 = new ClusterData();
+        cluster2_1 = new ClusterDataImpl();
         cluster2_1.setServiceUrl("http://cluster2_1:8080");
 
         Mockito.when(pulsarAdminService.clusters(emptyEnvironment.getBroker())).thenReturn(emptyClusters);

@@ -161,7 +161,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
             String tempBroker = (String) brokerMap.get("broker");
             // TODO: handle other protocols
             String broker = "http://" + tempBroker;
-            JsonObject result;
+            String result;
             try {
                 result = pulsarAdminService.brokerStats(broker).getTopics();
             } catch(PulsarAdminException e) {

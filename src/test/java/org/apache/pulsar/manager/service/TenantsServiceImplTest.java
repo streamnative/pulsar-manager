@@ -20,6 +20,7 @@ import org.apache.pulsar.client.admin.Namespaces;
 import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.client.admin.Tenants;
 import org.apache.pulsar.common.policies.data.TenantInfo;
+import org.apache.pulsar.common.policies.data.TenantInfoImpl;
 import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
 import org.junit.Assert;
@@ -65,7 +66,7 @@ public class TenantsServiceImplTest {
     public void tenantsServiceImplTest() throws PulsarAdminException {
         Mockito.when(pulsarAdminService.tenants("http://localhost:8080")).thenReturn(tenants);
         Mockito.when(tenants.getTenants()).thenReturn(Arrays.asList("public"));
-        TenantInfo tenantInfo = new TenantInfo(Sets.newHashSet("admin"), Sets.newHashSet("standalone"));
+        TenantInfo tenantInfo = new TenantInfoImpl(Sets.newHashSet("admin"), Sets.newHashSet("standalone"));
         Mockito.when(tenants.getTenantInfo("public")).thenReturn(tenantInfo);
         Mockito.when(pulsarAdminService.namespaces("http://localhost:8080")).thenReturn(namespaces);
         Mockito.when(namespaces.getNamespaces("public")).thenReturn(Arrays.asList("public/default"));
@@ -90,7 +91,7 @@ public class TenantsServiceImplTest {
         String role = "test-role";
         String cluster = "test-cluster";
         Mockito.when(pulsarAdminService.tenants("http://localhost:8080")).thenReturn(tenants);
-        TenantInfo tenantInfo = new TenantInfo(Sets.newHashSet(role), Sets.newHashSet(cluster));
+        TenantInfo tenantInfo = new TenantInfoImpl(Sets.newHashSet(role), Sets.newHashSet(cluster));
         Mockito.doNothing().when(tenants).createTenant(tenant, tenantInfo);
         Map<String, String> createTenantResult =  tenantsService.createTenant(
                 tenant, role, cluster, "http://localhost:8080");

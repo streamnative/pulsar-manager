@@ -22,9 +22,10 @@ import org.apache.pulsar.client.admin.Namespaces;
 import org.apache.pulsar.client.admin.PulsarAdmin;
 import org.apache.pulsar.client.admin.Tenants;
 import org.apache.pulsar.client.admin.Topics;
+import org.apache.pulsar.client.admin.internal.PulsarAdminImpl;
 
 public interface PulsarAdminService {
-    PulsarAdmin getPulsarAdmin(String url);
+    PulsarAdminImpl getPulsarAdmin(String url);
     BrokerStats brokerStats(String url);
     Clusters clusters(String url);
     Brokers brokers(String url);
